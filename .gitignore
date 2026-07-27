@@ -1,0 +1,48 @@
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+.coverage
+htmlcov/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs are generated during execution
+logs/*
+!logs/.gitkeep
+
+# Generated datasets are reproducible and may be too large for Git.
+# Keep only the small marker files that preserve the directory structure.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/archive/*
+!data/archive/.gitkeep
+data/output/*
+!data/output/.gitkeep
+
+# Jupyter-generated checkpoints
+.ipynb_checkpoints/
+
+# Power BI local cache and temporary files
+powerbi/**/.pbi/
+powerbi/**/*.abf

@@ -1,0 +1,9 @@
+# Runtime dependencies planned for the API and analytics stages.
+# The starter ETL uses Python's standard library, but declaring these now makes
+# the intended toolset visible and reproducible.
+requests>=2.32,<3.0
+pandas>=2.2,<3.0
+python-dotenv>=1.0,<2.0
+
+# Development dependency used to run the automated tests.
+pytest>=8.0,<9.0
