@@ -30,8 +30,10 @@ class Settings:
     """Store project paths and future API configuration in one object."""
 
     project_root: Path = PROJECT_ROOT
-    api_base_url: str = os.getenv("WNBA_API_BASE_URL", "https://example.invalid")
-    api_key: str = os.getenv("WNBA_API_KEY", "")
+    scoreboard_url: str = os.getenv(
+        "WNBA_SCOREBOARD_URL",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard",
+    )
     api_timeout_seconds: int = int(os.getenv("WNBA_API_TIMEOUT_SECONDS", "30"))
 
     @property

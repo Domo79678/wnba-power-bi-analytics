@@ -1,54 +1,53 @@
-"""Define the boundary between this project and a future WNBA data source.
+"""Communicate with the ESPN WNBA scoreboard endpoint.
 
-No live request is made in the scaffold stage. The helper methods below already
-handle URL and header construction, while ``fetch_json`` stops with an
-educational error until a source has been researched and selected.
+Only HTTP concerns belong here: URL, headers, timeout, and response errors.
+Saving raw data and reshaping games remain separate ETL responsibilities.
 """
 
 from dataclasses import dataclass
-from typing import Any
-from urllib.parse import urljoin
+
+import requests
 
 
-class LiveApiNotConfiguredError(RuntimeError):
-    """Explain that live API access is intentionally unavailable for now."""
+class WnbaApiError(RuntimeError):
+    """Provide a clear project-level message when the ESPN request fails."""
 
 
 @dataclass(frozen=True)
 class WnbaApiClient:
-    """Hold the settings needed to communicate with a future WNBA API."""
+    """Make a configured GET request to ESPN's WNBA scoreboard."""
 
-    base_url: str
-    api_key: str = ""
+    scoreboard_url: str
     timeout_seconds: int = 30
 
-    def build_url(self, endpoint: str) -> str:
-        """Combine a base URL and endpoint without duplicate or missing slashes."""
-
-        normalized_base = f"{self.base_url.rstrip('/')}/"
-        return urljoin(normalized_base, endpoint.lstrip("/"))
-
     def build_headers(self) -> dict[str, str]:
-        """Build HTTP headers without exposing a blank authentication value."""
+        """Tell ESPN that this pipeline expects a JSON response."""
 
-        headers = {"Accept": "application/json"}
-        if self.api_key:
-            # The exact authentication header may change when a source is chosen.
-            headers["Authorization"] = f"Bearer {self.api_key}"
-        return headers
+        return {"Accept": "application/json"}
 
-    def fetch_json(
-        self, endpoint: str, params: dict[str, Any] | None = None
-    ) -> dict[str, Any] | list[Any]:
-        """Eventually request JSON from the selected WNBA data source.
+    def fetch_scoreboard(self) -> requests.Response:
+        """GET the scoreboard and return its successful, unmodified response.
 
-        Raising an explicit exception is safer than pretending a request
-        succeeded. A later stage will implement this method with ``requests``
-        after authentication, rate limits, and response structure are known.
+        Returning the response lets the extraction layer save the exact bytes
+        ESPN sent. Tests replace ``requests.get`` with a local fake, so the test
+        suite never needs an internet connection.
         """
 
-        del endpoint, params  # Mark these future inputs as intentionally unused.
-        raise LiveApiNotConfiguredError(
-            "Live API access is not configured. Run `python -m scripts.main "
-            "--demo` to use the offline learning pipeline."
-        )
+        try:
+            response = requests.get(
+                self.scoreboard_url,
+                headers=self.build_headers(),
+                timeout=self.timeout_seconds,
+            )
+            response.raise_for_status()
+        except requests.Timeout as exc:
+            raise WnbaApiError(
+                f"ESPN scoreboard request timed out after "
+                f"{self.timeout_seconds} seconds: {self.scoreboard_url}"
+            ) from exc
+        except requests.RequestException as exc:
+            raise WnbaApiError(
+                f"ESPN scoreboard request failed for {self.scoreboard_url}: {exc}"
+            ) from exc
+
+        return response

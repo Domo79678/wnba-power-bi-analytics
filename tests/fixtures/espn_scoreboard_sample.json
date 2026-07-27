@@ -1,0 +1,94 @@
+{
+  "events": [
+    {
+      "id": "401000001",
+      "date": "2026-05-15T23:30Z",
+      "name": "Minnesota Lynx at Chicago Sky",
+      "shortName": "MIN @ CHI",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "competitions": [
+        {
+          "id": "401000001",
+          "attendance": 8123,
+          "neutralSite": false,
+          "venue": {
+            "fullName": "Wintrust Arena",
+            "address": {
+              "city": "Chicago",
+              "state": "IL"
+            }
+          },
+          "competitors": [
+            {
+              "id": "8",
+              "homeAway": "away",
+              "team": {
+                "id": "8",
+                "displayName": "Minnesota Lynx",
+                "abbreviation": "MIN"
+              },
+              "score": "82"
+            },
+            {
+              "id": "19",
+              "homeAway": "home",
+              "team": {
+                "id": "19",
+                "displayName": "Chicago Sky",
+                "abbreviation": "CHI"
+              },
+              "score": "77"
+            }
+          ],
+          "status": {
+            "type": {
+              "description": "Final",
+              "detail": "Final",
+              "completed": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "401000002",
+      "date": "2026-05-16T00:00Z",
+      "name": "Example Away at Example Home",
+      "shortName": "AWY @ HOM",
+      "season": {
+        "year": 2026,
+        "type": 1,
+        "slug": "preseason"
+      },
+      "competitions": [
+        {
+          "id": "401000002",
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": {
+                "displayName": "Example Home"
+              },
+              "score": "0"
+            },
+            {
+              "homeAway": "away",
+              "score": "0"
+            }
+          ],
+          "status": {
+            "type": {
+              "description": "Scheduled",
+              "detail": "Sat, May 16th at 8:00 PM EDT",
+              "completed": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

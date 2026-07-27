@@ -9,11 +9,11 @@ from scripts.main import run_demo_pipeline
 from scripts.transform import normalize_records
 
 
-def test_api_client_builds_a_clean_url() -> None:
-    """The future client should join URL pieces consistently."""
+def test_api_client_builds_json_headers() -> None:
+    """The client should clearly request JSON from ESPN."""
 
-    client = WnbaApiClient(base_url="https://data.example.test/")
-    assert client.build_url("/players") == "https://data.example.test/players"
+    client = WnbaApiClient(scoreboard_url="https://data.example.test/scoreboard")
+    assert client.build_headers() == {"Accept": "application/json"}
 
 
 def test_transform_normalizes_column_names() -> None:
