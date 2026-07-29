@@ -97,6 +97,26 @@ The raw filename includes UTC time so repeated extractions do not overwrite
 their source evidence. `games.csv` has a stable name because Power BI needs a
 consistent import path. Each run replaces that output table.
 
+## Build a historical WNBA seasons table
+
+Pass one or more season years from the project root:
+
+```powershell
+python -m scripts.main --historical-seasons 2025 2026
+```
+
+Each season response is preserved independently as
+`data/raw/espn_wnba_scoreboard_<season>_<UTC timestamp>.json`. All returned
+WNBA games are combined, deduplicated by game ID, sorted chronologically, and
+written to `data/output/games_historical.csv`.
+
+The historical table is deliberately separate from the live `games.csv`
+schedule table. The live file is a frequently refreshed snapshot for current
+schedule and score monitoring; the historical file is a multi-season,
+deduplicated dataset for stable league, opponent, and season comparisons in
+Power BI. Keeping separate output paths prevents a live refresh from replacing
+the larger historical dataset.
+
 Scores and optional game details may be blank when ESPN has not published them.
 The pipeline handles an empty event list by producing a header-only CSV.
 
@@ -130,7 +150,7 @@ Power BI CSV schema.
 - [x] Configuration and test foundations
 - [x] ESPN scoreboard live-data vertical slice
 - [x] Power BI-ready `games.csv`
-- [ ] Add historical date-range extraction
+- [x] Add historical season extraction
 - [ ] Design Power BI fact and dimension tables
 - [ ] Build the Power BI semantic model and report
 

@@ -43,6 +43,7 @@ def extract_scoreboard(
     client: WnbaApiClient,
     raw_data_dir: Path,
     extracted_at: datetime | None = None,
+    season: int | None = None,
 ) -> ScoreboardExtraction:
     """Request ESPN and save its complete response body as timestamped JSON.
 
@@ -50,13 +51,17 @@ def extract_scoreboard(
     on the computer clock. Production runs default to the current UTC time.
     """
 
-    response = client.fetch_scoreboard()
+    response = client.fetch_season(season) if season is not None else client.fetch_scoreboard()
     timestamp = extracted_at or datetime.now(timezone.utc)
     timestamp = timestamp.astimezone(timezone.utc)
     filename_timestamp = timestamp.strftime("%Y%m%dT%H%M%SZ")
     extracted_at_utc = timestamp.isoformat().replace("+00:00", "Z")
 
-    raw_path = raw_data_dir / f"espn_wnba_scoreboard_{filename_timestamp}.json"
+    season_part = f"{season}_" if season is not None else ""
+    raw_path = (
+        raw_data_dir
+        / f"espn_wnba_scoreboard_{season_part}{filename_timestamp}.json"
+    )
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     # Save response.content rather than re-serializing response.json(). This
     # preserves the exact successful body received from ESPN.

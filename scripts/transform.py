@@ -171,3 +171,29 @@ def transform_scoreboard_games(
         )
 
     return games
+
+
+def combine_scoreboard_games(
+    season_games: list[list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], int]:
+    """Combine seasons, deduplicate by game id, and sort chronologically.
+
+    The first occurrence wins when ESPN returns the same game in more than one
+    season response.
+    """
+
+    combined = [game for games in season_games for game in games]
+    unique_by_id: dict[Any, dict[str, Any]] = {}
+    for game in combined:
+        game_id = game.get("game_id")
+        if game_id not in unique_by_id:
+            unique_by_id[game_id] = game
+
+    unique_games = list(unique_by_id.values())
+    unique_games.sort(
+        key=lambda game: (
+            game.get("game_date_utc") is None,
+            game.get("game_date_utc") or "",
+        )
+    )
+    return unique_games, len(combined) - len(unique_games)

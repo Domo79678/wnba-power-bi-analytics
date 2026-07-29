@@ -5,6 +5,7 @@ Saving raw data and reshaping games remain separate ETL responsibilities.
 """
 
 from dataclasses import dataclass
+from typing import Iterable
 
 import requests
 
@@ -25,7 +26,20 @@ class WnbaApiClient:
 
         return {"Accept": "application/json"}
 
-    def fetch_scoreboard(self) -> requests.Response:
+    def build_season_params(self, season: int) -> dict[str, str]:
+        """Build ESPN's undocumented whole-season scoreboard query.
+
+        Keeping this mapping separate makes it easy to revise if ESPN changes
+        its date-query behavior.
+        """
+
+        if season < 1997:
+            raise ValueError("WNBA seasons must be 1997 or later.")
+        return {"dates": str(season), "limit": "1000"}
+
+    def fetch_scoreboard(
+        self, params: dict[str, str] | None = None
+    ) -> requests.Response:
         """GET the scoreboard and return its successful, unmodified response.
 
         Returning the response lets the extraction layer save the exact bytes
@@ -34,11 +48,13 @@ class WnbaApiClient:
         """
 
         try:
-            response = requests.get(
-                self.scoreboard_url,
-                headers=self.build_headers(),
-                timeout=self.timeout_seconds,
-            )
+            request_kwargs = {
+                "headers": self.build_headers(),
+                "timeout": self.timeout_seconds,
+            }
+            if params is not None:
+                request_kwargs["params"] = params
+            response = requests.get(self.scoreboard_url, **request_kwargs)
             response.raise_for_status()
         except requests.Timeout as exc:
             raise WnbaApiError(
@@ -51,3 +67,13 @@ class WnbaApiClient:
             ) from exc
 
         return response
+
+    def fetch_season(self, season: int) -> requests.Response:
+        """Fetch one requested season using ESPN's date-query support."""
+
+        return self.fetch_scoreboard(params=self.build_season_params(season))
+
+    def fetch_seasons(self, seasons: Iterable[int]) -> list[requests.Response]:
+        """Fetch requested seasons in order."""
+
+        return [self.fetch_season(season) for season in seasons]
